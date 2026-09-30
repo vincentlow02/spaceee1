@@ -3,72 +3,92 @@
 /**
  * SpaceePrototype page  —  app/spacee-prototype/page.js
  *
- * Purpose: Debug screen to verify the full Phase 1 data flow:
- *   Camera → Teachable Machine → recognitionHandler → UI display
+ * Phase 1 + Phase 2 debug screen.
  *
- * This page intentionally prioritises data correctness over visual polish.
- * Styling is minimal so the data flow is easy to inspect.
+ * Data flow:
+ *   Camera → Teachable Machine → recognitionHandler
+ *     → createMaterialFromRecognition → selectMaterial / removeMaterial
+ *       → updateSessionMaterials → explorationSession state
  *
- * Phase 2 extension point:
- *   Replace the local useState calls with a shared recognition store
- *   once Supabase exploration logging is introduced.
+ * UI layers are strictly separated from business logic:
+ *   - All selection logic lives in features/exploration/materialSelection.js
+ *   - All session logic lives in features/exploration/explorationSession.js
+ *   - This file only calls those functions and displays the result
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
+// ── Phase 1 layers ────────────────────────────────────────────────────────────
 import Camera from '@/components/Camera';
 import { loadModel, startPredictionLoop } from '@/lib/teachableMachine';
 import { processRecognitionResult } from '@/features/recognition/recognitionHandler';
 
-// --- Configuration -----------------------------------------------------------
-// Set NEXT_PUBLIC_TEACHABLE_MODEL_URL in .env.local to point to your TM model.
-// Example: https://teachablemachine.withgoogle.com/models/<YOUR_MODEL_ID>/
+// ── Phase 2 layers ────────────────────────────────────────────────────────────
+import { createMaterialFromRecognition } from '@/features/exploration/explorationState';
+import {
+  selectMaterial,
+  removeMaterial,
+  clearSelection,
+  canAddMaterial,
+  MAX_SELECTION,
+} from '@/features/exploration/materialSelection';
+import {
+  createSession,
+  updateSessionMaterials,
+  advanceSessionStatus,
+  SESSION_STATUSES,
+} from '@/features/exploration/explorationSession';
+
+// ── Configuration ─────────────────────────────────────────────────────────────
 const MODEL_URL = process.env.NEXT_PUBLIC_TEACHABLE_MODEL_URL;
 
-// -----------------------------------------------------------------------------
+// =============================================================================
 
 export default function SpaceePrototypePage() {
-  // Recognition result in Spacee format (null = not started yet)
+  // ── Phase 1 state ───────────────────────────────────────────────────────────
   const [recognitionResult, setRecognitionResult] = useState(null);
-  // Raw TM predictions for the debug panel
   const [rawPredictions, setRawPredictions] = useState(null);
-  // UI state
-  const [modelStatus, setModelStatus] = useState('idle'); // 'idle' | 'loading' | 'ready' | 'error'
+  const [modelStatus, setModelStatus] = useState('idle');
   const [cameraError, setCameraError] = useState('');
-
-  // Hold a reference to the prediction loop controller so we can stop it
   const predictionLoopRef = useRef(null);
 
-  /**
-   * Called by <Camera> once the video stream is live.
-   * Loads the TM model then starts the prediction loop.
-   */
+  // ── Phase 2 state ───────────────────────────────────────────────────────────
+  // The current material object built from the latest recognition result
+  const [currentMaterial, setCurrentMaterial] = useState(null);
+  // Selected materials list (up to MAX_SELECTION)
+  const [selectedMaterials, setSelectedMaterials] = useState([]);
+  // Exploration session
+  const [session, setSession] = useState(() => createSession());
+
+  // ── Sync session whenever selectedMaterials changes ─────────────────────────
+  useEffect(() => {
+    setSession((prev) => updateSessionMaterials(prev, selectedMaterials));
+  }, [selectedMaterials]);
+
+  // ── Phase 1: camera → TM model ──────────────────────────────────────────────
   const handleVideoReady = useCallback(async (videoElement) => {
     if (!MODEL_URL) {
       setModelStatus('error');
-      console.warn(
-        'SpaceePrototype: NEXT_PUBLIC_TEACHABLE_MODEL_URL is not set. ' +
-          'Add it to .env.local and restart the dev server.'
-      );
       return;
     }
-
     setModelStatus('loading');
-
     try {
       const model = await loadModel(MODEL_URL);
       setModelStatus('ready');
 
-      // Start the continuous prediction loop
       predictionLoopRef.current = startPredictionLoop(
         model,
         videoElement,
         (predictions) => {
-          // Keep raw TM output for the debug panel
           setRawPredictions(predictions);
 
-          // Transform into the locked Spacee data contract
+          // Phase 1 → structured recognition result
           const result = processRecognitionResult(predictions);
           setRecognitionResult(result);
+
+          // Phase 2 → build material object from latest prediction
+          const material = createMaterialFromRecognition(result);
+          setCurrentMaterial(material);
         }
       );
     } catch (err) {
@@ -81,19 +101,50 @@ export default function SpaceePrototypePage() {
     setCameraError(msg);
   }, []);
 
-  // Format confidence as a percentage string, e.g. "82%"
+  // ── Phase 2: selection actions ───────────────────────────────────────────────
+
+  /** Capture the current detection and add it to the selection. */
+  const handleAddMaterial = useCallback(() => {
+    if (!currentMaterial) return;
+    setSelectedMaterials((prev) => selectMaterial(prev, currentMaterial));
+  }, [currentMaterial]);
+
+  /** Remove a specific material by id. */
+  const handleRemoveMaterial = useCallback((materialId) => {
+    setSelectedMaterials((prev) => removeMaterial(prev, materialId));
+  }, []);
+
+  /** Clear all selected materials and reset session status. */
+  const handleClearSelection = useCallback(() => {
+    setSelectedMaterials(clearSelection());
+    setSession((prev) => advanceSessionStatus(prev, SESSION_STATUSES.SELECTING));
+  }, []);
+
+  /** Mark session as ready when 3 materials are selected. */
+  const handleMarkReady = useCallback(() => {
+    setSession((prev) =>
+      advanceSessionStatus(prev, SESSION_STATUSES.READY_FOR_GENERATION)
+    );
+  }, []);
+
+  // ── Helpers ──────────────────────────────────────────────────────────────────
   const fmtPct = (confidence) => `${Math.round(confidence * 100)}%`;
 
-  return (
-    <main style={styles.page}>
-      <h1 style={styles.title}>Spacee — Phase 1 Prototype</h1>
+  const selectionFull = !canAddMaterial(selectedMaterials);
+  const canMarkReady =
+    selectedMaterials.length > 0 &&
+    session.status === SESSION_STATUSES.SELECTING;
 
-      {/* ── Status bar ─────────────────────────────────────────────────────── */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Status</h2>
+  // ── Render ───────────────────────────────────────────────────────────────────
+  return (
+    <main style={s.page}>
+      <h1 style={s.title}>Spacee — Phase 1 + 2 Prototype</h1>
+
+      {/* ── Status ──────────────────────────────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Status</h2>
         <p>
-          Model:{' '}
-          <strong>
+          Model: <strong>
             {modelStatus === 'idle' && 'Waiting for camera…'}
             {modelStatus === 'loading' && 'Loading Teachable Machine model…'}
             {modelStatus === 'ready' && '✓ Running'}
@@ -103,70 +154,140 @@ export default function SpaceePrototypePage() {
                 : '✗ NEXT_PUBLIC_TEACHABLE_MODEL_URL not set')}
           </strong>
         </p>
-        {cameraError && <p style={styles.error}>{cameraError}</p>}
+        <p>
+          Session: <strong>{session.id}</strong> —{' '}
+          <strong style={s.statusBadge(session.status)}>{session.status}</strong>
+        </p>
+        {cameraError && <p style={s.error}>{cameraError}</p>}
       </section>
 
-      {/* ── Camera ─────────────────────────────────────────────────────────── */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Camera</h2>
-        <div style={styles.cameraContainer}>
+      {/* ── Camera ──────────────────────────────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Camera</h2>
+        <div style={s.cameraContainer}>
           <Camera onVideoReady={handleVideoReady} onError={handleCameraError} />
         </div>
       </section>
 
-      {/* ── Recognition Result ─────────────────────────────────────────────── */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Recognition Result</h2>
+      {/* ── Current Recognition (Phase 2) ────────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Current Recognition</h2>
 
         {recognitionResult ? (
-          <div>
-            <p style={styles.primaryLabel}>
-              Detected Material:{' '}
-              <strong>{recognitionResult.primaryCategory}</strong>
-            </p>
+          <div style={s.currentDetection}>
+            <div style={s.detectionInfo}>
+              <span style={s.detectionCategory}>
+                {recognitionResult.primaryCategory}
+              </span>
+              <span style={s.detectionConfidence}>
+                {fmtPct(recognitionResult.priority[0].confidence)}
+              </span>
+            </div>
 
-            <ol style={styles.priorityList}>
-              {recognitionResult.priority.map((item, idx) => (
-                <li key={item.category} style={styles.priorityItem}>
-                  <span style={styles.rank}>{idx + 1}.</span>
-                  <span style={styles.categoryName}>{item.category}</span>
-                  <span style={styles.confidence}>
-                    {fmtPct(item.confidence)}
-                  </span>
-                  {/* Confidence bar */}
-                  <div style={styles.barTrack}>
-                    <div
-                      style={{
-                        ...styles.barFill,
-                        width: fmtPct(item.confidence),
-                      }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <button
+              style={selectionFull ? s.btnDisabled : s.btnAdd}
+              onClick={handleAddMaterial}
+              disabled={selectionFull}
+              title={selectionFull ? `Maximum ${MAX_SELECTION} materials reached` : 'Add to selection'}
+            >
+              {selectionFull ? `Full (${MAX_SELECTION}/${MAX_SELECTION})` : '+ Add Material'}
+            </button>
           </div>
         ) : (
-          <p style={styles.placeholder}>
-            No prediction yet — allow camera access and wait for the model to
-            load.
+          <p style={s.placeholder}>
+            No detection yet — allow camera access and wait for the model.
           </p>
         )}
       </section>
 
-      {/* ── Raw Data Debug ─────────────────────────────────────────────────── */}
-      <section style={styles.section}>
-        <h2 style={styles.sectionTitle}>Raw Data Debug</h2>
+      {/* ── Selected Materials (Phase 2) ─────────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Selected Materials</h2>
 
-        <h3 style={styles.debugLabel}>Spacee Recognition Result</h3>
-        <pre style={styles.codeBlock}>
-          {recognitionResult
-            ? JSON.stringify(recognitionResult, null, 2)
-            : 'null'}
+        <p style={s.selectionCount}>
+          {selectedMaterials.length} / {MAX_SELECTION}
+        </p>
+
+        {selectedMaterials.length === 0 ? (
+          <p style={s.placeholder}>No materials selected yet.</p>
+        ) : (
+          <ol style={s.selectedList}>
+            {selectedMaterials.map((mat, idx) => (
+              <li key={mat.id} style={s.selectedItem}>
+                <span style={s.selectedRank}>{idx + 1}.</span>
+                <span style={s.selectedName}>{mat.name}</span>
+                <span style={s.selectedCategory}>({mat.category})</span>
+                <span style={s.selectedConf}>{fmtPct(mat.confidence)}</span>
+                <button
+                  style={s.btnRemove}
+                  onClick={() => handleRemoveMaterial(mat.id)}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        <div style={s.selectionActions}>
+          <button
+            style={canMarkReady ? s.btnReady : s.btnDisabled}
+            onClick={handleMarkReady}
+            disabled={!canMarkReady}
+          >
+            Mark Ready for Generation
+          </button>
+          <button
+            style={selectedMaterials.length > 0 ? s.btnClear : s.btnDisabled}
+            onClick={handleClearSelection}
+            disabled={selectedMaterials.length === 0}
+          >
+            Clear All
+          </button>
+        </div>
+      </section>
+
+      {/* ── Phase 1: Full recognition list ───────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Recognition Priority (Phase 1)</h2>
+
+        {recognitionResult ? (
+          <ol style={s.priorityList}>
+            {recognitionResult.priority.map((item, idx) => (
+              <li key={item.category} style={s.priorityItem}>
+                <span style={s.rank}>{idx + 1}.</span>
+                <span style={s.categoryName}>{item.category}</span>
+                <span style={s.confidence}>{fmtPct(item.confidence)}</span>
+                <div style={s.barTrack}>
+                  <div style={{ ...s.barFill, width: fmtPct(item.confidence) }} />
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p style={s.placeholder}>Waiting for predictions…</p>
+        )}
+      </section>
+
+      {/* ── Raw Debug ────────────────────────────────────────────────────────── */}
+      <section style={s.section}>
+        <h2 style={s.sectionTitle}>Raw Data Debug</h2>
+
+        <h3 style={s.debugLabel}>Exploration Session</h3>
+        <pre style={s.codeBlock}>{JSON.stringify(session, null, 2)}</pre>
+
+        <h3 style={s.debugLabel}>Current Material Object</h3>
+        <pre style={s.codeBlock}>
+          {currentMaterial ? JSON.stringify(currentMaterial, null, 2) : 'null'}
         </pre>
 
-        <h3 style={styles.debugLabel}>Raw Teachable Machine Predictions</h3>
-        <pre style={styles.codeBlock}>
+        <h3 style={s.debugLabel}>Recognition Result (Phase 1)</h3>
+        <pre style={s.codeBlock}>
+          {recognitionResult ? JSON.stringify(recognitionResult, null, 2) : 'null'}
+        </pre>
+
+        <h3 style={s.debugLabel}>Raw Teachable Machine Predictions</h3>
+        <pre style={s.codeBlock}>
           {rawPredictions ? JSON.stringify(rawPredictions, null, 2) : 'null'}
         </pre>
       </section>
@@ -174,9 +295,9 @@ export default function SpaceePrototypePage() {
   );
 }
 
-// ── Inline styles (keeps the debug page self-contained) ──────────────────────
+// ── Styles ────────────────────────────────────────────────────────────────────
 
-const styles = {
+const s = {
   page: {
     fontFamily: 'system-ui, sans-serif',
     maxWidth: 720,
@@ -216,15 +337,110 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryLabel: {
-    fontSize: '1.1rem',
-    marginBottom: '0.75rem',
+
+  // ── Current detection ──
+  currentDetection: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '1rem',
   },
-  priorityList: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
+  detectionInfo: { display: 'flex', alignItems: 'baseline', gap: '0.75rem' },
+  detectionCategory: { fontSize: '1.4rem', fontWeight: '700' },
+  detectionConfidence: { fontSize: '1rem', color: '#555' },
+
+  // ── Selected materials ──
+  selectionCount: {
+    fontSize: '0.85rem',
+    color: '#888',
+    marginBottom: '0.5rem',
   },
+  selectedList: { listStyle: 'none', padding: 0, margin: '0 0 1rem' },
+  selectedItem: {
+    display: 'grid',
+    gridTemplateColumns: '1.5rem 7rem 6rem 3.5rem 1fr',
+    alignItems: 'center',
+    gap: '0.5rem',
+    padding: '0.35rem 0',
+    borderBottom: '1px solid #f0f0f0',
+  },
+  selectedRank: { color: '#aaa', fontSize: '0.85rem' },
+  selectedName: { fontWeight: '600' },
+  selectedCategory: { color: '#888', fontSize: '0.8rem' },
+  selectedConf: { color: '#333', fontVariantNumeric: 'tabular-nums', fontSize: '0.85rem' },
+  selectionActions: { display: 'flex', gap: '0.5rem', marginTop: '0.5rem' },
+
+  // ── Buttons ──
+  btnAdd: {
+    padding: '0.4rem 0.9rem',
+    background: '#111',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 4,
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+    whiteSpace: 'nowrap',
+  },
+  btnRemove: {
+    padding: '0.25rem 0.6rem',
+    background: 'transparent',
+    color: '#c00',
+    border: '1px solid #c00',
+    borderRadius: 4,
+    cursor: 'pointer',
+    fontSize: '0.75rem',
+    justifySelf: 'end',
+  },
+  btnReady: {
+    padding: '0.4rem 0.9rem',
+    background: '#2a7',
+    color: '#fff',
+    border: 'none',
+    borderRadius: 4,
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+  },
+  btnClear: {
+    padding: '0.4rem 0.9rem',
+    background: 'transparent',
+    color: '#666',
+    border: '1px solid #ccc',
+    borderRadius: 4,
+    cursor: 'pointer',
+    fontSize: '0.85rem',
+  },
+  btnDisabled: {
+    padding: '0.4rem 0.9rem',
+    background: '#eee',
+    color: '#aaa',
+    border: '1px solid #ddd',
+    borderRadius: 4,
+    cursor: 'not-allowed',
+    fontSize: '0.85rem',
+    whiteSpace: 'nowrap',
+  },
+
+  // ── Status badge ──
+  statusBadge: (status) => ({
+    padding: '0.1rem 0.5rem',
+    borderRadius: 4,
+    fontSize: '0.8rem',
+    background:
+      status === SESSION_STATUSES.SELECTING
+        ? '#eef'
+        : status === SESSION_STATUSES.READY_FOR_GENERATION
+        ? '#efe'
+        : '#fee',
+    color:
+      status === SESSION_STATUSES.SELECTING
+        ? '#44a'
+        : status === SESSION_STATUSES.READY_FOR_GENERATION
+        ? '#272'
+        : '#a44',
+  }),
+
+  // ── Phase 1 priority list ──
+  priorityList: { listStyle: 'none', padding: 0, margin: 0 },
   priorityItem: {
     display: 'grid',
     gridTemplateColumns: '1.5rem 8rem 3.5rem 1fr',
@@ -235,18 +451,15 @@ const styles = {
   rank: { color: '#888', fontSize: '0.85rem' },
   categoryName: { fontWeight: '600' },
   confidence: { color: '#333', textAlign: 'right', fontVariantNumeric: 'tabular-nums' },
-  barTrack: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#eee',
-    overflow: 'hidden',
-  },
+  barTrack: { height: 8, borderRadius: 4, backgroundColor: '#eee', overflow: 'hidden' },
   barFill: {
     height: '100%',
     backgroundColor: '#333',
     borderRadius: 4,
     transition: 'width 0.15s ease',
   },
+
+  // ── Misc ──
   placeholder: { color: '#888', fontStyle: 'italic' },
   debugLabel: { fontSize: '0.8rem', color: '#888', margin: '0.75rem 0 0.25rem' },
   codeBlock: {
