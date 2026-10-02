@@ -15,21 +15,32 @@
  *  - onVideoReady(videoElement): called once the video is playing.
  *                                Pass this element to startPredictionLoop().
  *  - onError(errorMessage):      called if permission is denied or camera fails.
+ *  - onStatusChange(status):      reports idle/requesting/active/error.
  */
 
 import { useEffect, useRef, useState } from 'react';
 
-export default function Camera({ onVideoReady, onError }) {
+export default function Camera({ onVideoReady, onError, onStatusChange, videoClassName = '' }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
+  const onVideoReadyRef = useRef(onVideoReady);
+  const onErrorRef = useRef(onError);
+  const onStatusChangeRef = useRef(onStatusChange);
   const [status, setStatus] = useState('idle'); // 'idle' | 'requesting' | 'active' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    onVideoReadyRef.current = onVideoReady;
+    onErrorRef.current = onError;
+    onStatusChangeRef.current = onStatusChange;
+  }, [onVideoReady, onError, onStatusChange]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function initCamera() {
       setStatus('requesting');
+      onStatusChangeRef.current?.('requesting');
 
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -55,9 +66,10 @@ export default function Camera({ onVideoReady, onError }) {
 
         await video.play();
         setStatus('active');
+        onStatusChangeRef.current?.('active');
 
-        if (onVideoReady) {
-          onVideoReady(video);
+        if (onVideoReadyRef.current) {
+          onVideoReadyRef.current(video);
         }
       } catch (err) {
         if (cancelled) return;
@@ -69,7 +81,8 @@ export default function Camera({ onVideoReady, onError }) {
 
         setStatus('error');
         setErrorMessage(msg);
-        if (onError) onError(msg);
+        onStatusChangeRef.current?.('error');
+        if (onErrorRef.current) onErrorRef.current(msg);
       }
     }
 
@@ -83,7 +96,7 @@ export default function Camera({ onVideoReady, onError }) {
         streamRef.current = null;
       }
     };
-  }, []); // Run once on mount; onVideoReady / onError are stable refs from parent
+  }, []);
 
   return (
     <div className="camera-wrapper">
@@ -98,7 +111,7 @@ export default function Camera({ onVideoReady, onError }) {
       {/* Video element is always in the DOM so the ref is available during setup */}
       <video
         ref={videoRef}
-        className="camera-video"
+        className={`camera-video ${videoClassName}`.trim()}
         muted
         playsInline
         style={{ display: status === 'active' ? 'block' : 'none' }}
