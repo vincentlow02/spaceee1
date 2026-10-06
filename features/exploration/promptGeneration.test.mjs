@@ -100,3 +100,14 @@ test('createdAt metadata does not influence the creative prompt', () => {
 
   assert.equal(first.prompt, second.prompt);
 });
+
+test('uses the fixed base as structural input, not just as a style reference', () => {
+  const {prompt} = buildSpatialPrompt(snapshot([
+    {materialId:'coke-can'}, {materialId:'blackcan'}, {materialId:'tissue'},
+  ]));
+  assert.match(prompt, /fixed spatial template, not a style reference/);
+  assert.match(prompt, /Preserve its room geometry, camera angle, perspective/);
+  assert.match(prompt, /central floor-to-ceiling window/);
+  assert.match(prompt, /one 2D spatial image of the supplied base room/);
+  assert.doesNotMatch(prompt, /not a photorealistic 3D interior rendering/);
+});

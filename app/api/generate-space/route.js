@@ -4,10 +4,17 @@ import {
 } from '@/features/exploration/generationRequest';
 import { generateQwenImage } from '@/lib/qwenImage';
 
+export const runtime = 'nodejs';
+
 function safeGenerationError(error) {
   switch (error?.code) {
     case 'MISSING_API_KEY':
       return { status: 500, message: 'Qwen API is not configured.' };
+    case 'BASE_IMAGE_UNAVAILABLE':
+      return { status: 500, message: 'The fixed space base image is unavailable.' };
+    case 'INVALID_IMAGE_EDIT_MODEL':
+    case 'INVALID_IMAGE_EDIT_INPUT':
+      return { status: 500, message: 'Space image editing is not configured correctly.' };
     case 'QWEN_TIMEOUT':
       return { status: 504, message: 'Image generation timed out. Please try again.' };
     case 'QWEN_MALFORMED_RESPONSE':

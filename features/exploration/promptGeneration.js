@@ -1,5 +1,6 @@
 import { MAX_SELECTION } from './materialSelection.js';
 import { resolveTemporaryMaterialInformation } from '../materials/temporaryMaterialInformation.js';
+import { SPATIAL_TEMPLATE_INSTRUCTIONS } from './spatialTemplate.js';
 
 /**
  * Convert discoveries into a neutral exploration prompt without prescribing
@@ -22,7 +23,7 @@ export function generateExplorationPrompt(materials) {
     `Discovered material categories: ${categories.join(', ')}.`,
     'Based only on these discovered material categories, explore possible spatial environments.',
     'Interpret the relationship between these materials and generate an unexpected spatial concept.',
-    'Create a realistic 2D spatial visualization.',
+    SPATIAL_TEMPLATE_INSTRUCTIONS,
   ].join('\n');
 }
 
@@ -97,7 +98,9 @@ export function buildSpatialPrompt(
 
   const prompt = [
     'ROLE',
-    'Explore spatial possibilities from a set of physically discovered materials.',
+    'Redesign the supplied base space through a set of physically discovered materials.',
+    '',
+    SPATIAL_TEMPLATE_INSTRUCTIONS,
     '',
     'OBSERVED FACTS',
     'The following identities and factual properties were supplied by the discovery system. Treat unavailable information as unknown.',
@@ -115,7 +118,10 @@ export function buildSpatialPrompt(
     '- Base the interpretation on the supplied facts while keeping creative spatial interpretation open-ended.',
     '',
     'OUTPUT',
-    'Generate a realistic 2D visualization of a coherent spatial environment with clear spatial depth, a visible relationship between the discovered material qualities, and a visually understandable composition.',
+    'Generate one 2D spatial image of the supplied base room redesigned through the selected material combination.',
+    'Preserve the base room structure and camera perspective while transforming its material expression. Do not create a different room, a flat collage, a product mockup, or a technical floor plan.',
+    'Translate the discovered material qualities into the spatial composition rather than arranging recognizable product objects in a room.',
+    'Keep architectural style, atmosphere, spatial type, and emotional interpretation open to your interpretation of the materials; do not impose fixed material meanings.',
   ].join('\n');
 
   return {
