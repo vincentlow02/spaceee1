@@ -4,17 +4,13 @@
  * These records only support the current recognition test classes. They are
  * intentionally factual and sparse, and are not the final Material Database.
  */
+import { resolveMaterial } from '../../lib/materials/materials.js';
+
 const UNKNOWN_PROPERTIES = Object.freeze({
   material: 'unknown',
   texture: 'unknown',
   color: 'unknown',
   form: 'unknown',
-});
-
-const TEMPORARY_MATERIALS = Object.freeze({
-  'coke-can': Object.freeze({ id: 'coke-can', name: 'Coke Can' }),
-  blackcan: Object.freeze({ id: 'blackcan', name: 'Black Can' }),
-  tissue: Object.freeze({ id: 'tissue', name: 'Tissue' }),
 });
 
 function nameFromId(materialId) {
@@ -29,7 +25,8 @@ export function resolveTemporaryMaterialInformation(materialId) {
   }
 
   const normalizedId = materialId.trim();
-  const known = TEMPORARY_MATERIALS[normalizedId];
+  const known = resolveMaterial(normalizedId);
+  if (known) return known;
 
   return {
     id: normalizedId,

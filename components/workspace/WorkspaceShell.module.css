@@ -1,0 +1,60 @@
+.shell { --sidebar-width: 185px; min-height: 100svh; display: grid; grid-template-columns: var(--sidebar-width) minmax(0,1fr); background: #fafafa; color: #000; font-family: var(--font-geist-sans), Arial, sans-serif; }
+.collapsed { --sidebar-width: 64px; }
+.sidebar { position: sticky; top: 0; height: 100svh; display: flex; flex-direction: column; overflow-y: auto; background: #fff; min-width: 0; padding: 37px 20px 24px 28px; z-index: 10; font-family: var(--font-spacee-navigation), Arial, sans-serif; }
+.accountFooter { margin-top: auto; margin-left: -12px; margin-right: -8px; padding-top: 24px; }
+.brand { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0 0 0 7px; color: #000; cursor: pointer; font-size: 20px; font-weight: 500; line-height: 24px; }
+.toggleIcon { width: 7.596px; height: 10.656px; display: grid; place-items: center; }
+.toggleIcon img { display: block; max-width: none; transform: rotate(-90.44deg); }
+.navigation { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+.navItem { display: flex; align-items: center; gap: 12px; min-height: 15px; padding: 0; border: 0; color: #000; background: none; font-size: 12px; line-height: 15px; text-align: left; cursor: pointer; }
+.navItem:hover { color: #69645f; }
+.navIcon { width: 14px; height: 14px; display: grid; place-items: center; flex-shrink: 0; }
+.navIcon img { display: block; max-width: none; }
+.collapsed .sidebar { padding-left: 24px; padding-right: 16px; }
+.collapsed .brand { padding-left: 4px; }
+.collapsed .brandName,.collapsed .navLabel { display: none; }
+.collapsed .toggleIcon img { transform: rotate(89.56deg); }
+.workspace { position: relative; min-width: 0; container-type: inline-size; container-name: workspace; }
+.workspaceWithLibrary { display: grid; grid-template-columns: clamp(260px,22vw,320px) minmax(0,1fr); align-items: start; }
+.materialPanel { grid-column: 1; position: sticky; top: 0; min-width: 0; height: 100svh; overflow-y: auto; background: #fff; border-left: 1px solid #ededed; border-right: 1px solid #ededed; }
+.navItem[aria-current='page'] { background: #e6f2e7; border-radius: 10px; box-shadow: 0 0 0 9px #e6f2e7; }
+.topBar { position: absolute; top: 37px; left: 30px; right: 45px; display: none; z-index: 3; }
+.avatar { width: 25px; height: 26px; border: 0; border-radius: 42px; background: #bf360c; color: #fff; font: 12px Helvetica, Arial, sans-serif; letter-spacing: .48px; cursor: pointer; padding: 0; }
+.accountArea { position: relative; }
+.accountPopover { position: absolute; right: 0; top: 38px; width: 220px; background: #fff; border: 1px solid #e8e5e1; border-radius: 12px; padding: 16px; box-shadow: 0 8px 30px #0000000a; font-size: 12px; }
+.accountPopover p { margin: 0 0 8px; font-weight: 500; }
+.accountPopover span { color: #8e8787; }
+.accountPopover nav { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+.accountPopover a { color: #69645f; text-decoration: none; }
+.accountPopover button { display: block; margin-top: 14px; background: none; border: 0; color: #000; padding: 0; cursor: pointer; }
+.main { padding: clamp(60px,8svh,90px) clamp(24px,3.125vw,60px) clamp(32px,8svh,77px); min-height: 100svh; }
+.withMaterialPanel { grid-column: 2; min-width: 0; padding: 32px clamp(20px,2.5vw,40px); display: flex; align-items: center; }
+.canvasMain { padding: 28px clamp(16px,2vw,36px) 24px; }
+.mobileToggle,.mobileClose,.backdrop { display: none; }
+.shell button:focus-visible,.shell a:focus-visible { outline: 2px solid #8e8787; outline-offset: 4px; }
+/* Respond to the available workspace width, including collapsed navigation. */
+@container workspace (max-width:800px) {
+  .materialPanel { grid-column: 1 / -1; position: static; height: auto; overflow-y: visible; border-bottom: 1px solid #ededed; }
+  .withMaterialPanel { grid-column: 1 / -1; min-height: 0; padding: 28px 24px; }
+}
+@media (max-width:700px) {
+  .workspaceWithLibrary { padding-top: 64px; }
+  .materialPanel { border-left: 0; border-right: 0; }
+  .shell { display: block; }
+  .sidebar { display: none; }
+  .drawerOpen .sidebar { transform: translateX(0); visibility: visible; }
+  .collapsed .sidebar { padding: 30px 28px; }
+  .collapsed .brandName,.collapsed .navLabel { display: inline; }
+  .brand { padding-left: 0; }
+  .toggleIcon { display: none; }
+  .mobileClose { display: block; position: absolute; right: 20px; top: 30px; border: 0; background: none; color: #777; font-size: 24px; cursor: pointer; }
+  .backdrop { display: block; position: fixed; inset: 0; z-index: 9; border: 0; background: #0003; cursor: pointer; }
+  .topBar { display: flex; top: 24px; left: 20px; right: 20px; justify-content: space-between; }
+  .mobileToggle { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; font-size: 17px; font-weight: 500; color: #000; cursor: pointer; }
+  .mobileToggle > span:first-child { font-size: 19px; }
+  .main { padding: 100px 20px 40px; }
+  .withMaterialPanel { padding: 24px 16px 32px; }
+  .canvasMain { padding: 88px 12px 24px; }
+  .navigation { gap: 24px; }
+  .navItem { min-height: 24px; }
+}

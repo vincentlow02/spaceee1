@@ -1,13 +1,6 @@
 import { RECOGNITION_STATUSES } from './positionRecognition.js';
 import { RECOGNITION_THRESHOLD } from './recognitionConfig.js';
-
-function toTemporaryMaterialId(className) {
-  return className
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
-}
+import { materialIdFromRecognitionLabel } from '../../lib/materials/materials.js';
 
 /**
  * Adapt one-region Teachable Machine output to a Spacee position record.
@@ -38,7 +31,7 @@ export function adaptTeachableMachinePredictions(
   return {
     position,
     priority: position,
-    materialId: recognized ? toTemporaryMaterialId(highest.className) : null,
+    materialId: recognized ? materialIdFromRecognitionLabel(highest.className) : null,
     className: highest?.className ?? null,
     confidence,
     status: recognized

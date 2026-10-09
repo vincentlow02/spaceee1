@@ -74,6 +74,7 @@ export function buildSpatialPrompt(
       materialId: snapshotMaterial.materialId,
       name: knownValue(information?.name),
       category: knownValue(information?.category),
+      materialPrompt: information?.materialPrompt ?? null,
       properties: {
         material: knownValue(properties.material),
         texture: knownValue(properties.texture),
@@ -88,6 +89,7 @@ export function buildSpatialPrompt(
     `Name: ${material.name}`,
     `Material ID: ${material.materialId}`,
     `Category: ${material.category}`,
+    ...(material.materialPrompt ? [`Material profile: ${material.materialPrompt}`] : []),
     'Known properties:',
     `- Material: ${material.properties.material}`,
     `- Texture: ${material.properties.texture}`,

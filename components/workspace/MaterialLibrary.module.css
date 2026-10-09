@@ -1,0 +1,33 @@
+.library { padding: 30px 24px; color: #111; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.header h2 { margin: 0; font-size: 20px; font-weight: 500; letter-spacing: -.4px; }
+.header button { border: 0; background: none; color: #888; font-size: 22px; cursor: pointer; }
+.categories { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 20px; }
+.categories button { flex-shrink: 0; padding: 7px; border: 1px solid #e3e3e3; border-radius: 22px; background: #fff; color: #777; font-size: 11px; cursor: pointer; }
+.categories button[aria-pressed='true'] { color: #21492a; background: #e6f2e7; border-color: #b6d8ba; }
+.search { display: flex; align-items: center; gap: 9px; border: 1px solid #e4e4e4; border-radius: 9px; padding: 10px; margin-bottom: 22px; }
+.search svg { width: 19px; height: 19px; flex-shrink: 0; }
+.search input { width: 100%; min-width: 0; border: 0; background: transparent; font-size: 13px; outline: none; }
+.search:focus-within { border-color: #8eaa92; box-shadow: 0 0 0 2px #e6f2e7; }
+.grid { list-style: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 0; margin: 0; }
+.card { display: block; width: 100%; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; }
+.thumbnail { display: grid; place-items: center; aspect-ratio: 1.4; border-radius: 11px; background: #e9e5df; border: 1px solid #00000004; transition: box-shadow .15s; }
+.thumbnail[data-tone='1'] { background: #e8e8e6; }
+.thumbnail[data-tone='2'] { background: #efece5; }
+.thumbnail[data-tone='3'] { background: #dededb; }
+.thumbnail > span { color: #98938c; font-size: 10px; }
+.card:hover .thumbnail { box-shadow: 0 0 0 2px #b6d8ba; }
+.name { display: block; font-size: 12px; line-height: 1.5; margin-top: 7px; }
+.hint,.empty { margin: 24px 0 0; color: #929292; font-size: 12px; line-height: 1.6; }
+@media (max-width:1000px) and (min-width:701px) { .library { padding: 24px 16px; } .header h2 { font-size: 17px; } .categories button { padding: 6px 9px; } .grid { gap: 12px; } }
+@media (max-width:700px) { .library { padding: 20px; } }
+@container workspace (max-width:800px) {
+  .library { padding: 18px 20px; }
+  .header { margin-bottom: 12px; }
+  .categories { margin-bottom: 12px; }
+  .search { margin-bottom: 14px; }
+  .grid { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 8px; }
+  .grid > li { flex: 0 0 120px; }
+  .thumbnail { aspect-ratio: 1.6; }
+  .hint { display: none; }
+}
