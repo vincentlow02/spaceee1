@@ -48,13 +48,18 @@ export default function SpaceeHome({headingClassName,navigationFontClassName}) {
     const position = targetPosition ?? activePosition ?? (selection.findIndex(slot => !slot.materialId) + 1 || null);
     if (!position) {setSelectionNotice('Select a slot to replace, or drag the material onto that slot.'); return;}
     selectLibrary(position, materialId);
-    setActivePosition(position);
+    // Keep the Library workflow moving: after a successful placement, make
+    // the next empty slot the target while still allowing direct slot drops.
+    const nextEmptyPosition = selection.findIndex((slot, index) =>
+      index + 1 !== position && !slot.materialId,
+    ) + 1;
+    setActivePosition(nextEmptyPosition || null);
     setSelectionNotice('');
   }
 
   function generateSpace() {
     if (isPending() || !readyToGenerate) return;
-    return generate(createMaterialSelectionSnapshot(selection, liveState));
+    return generate(createMaterialSelectionSnapshot(selection, liveState),description);
   }
 
   function clearAll() {
@@ -77,7 +82,7 @@ export default function SpaceeHome({headingClassName,navigationFontClassName}) {
   }
 
   return <div className={navigationFontClassName}>
-    <WorkspaceShell activeSection={activeSection} onNavigate={setActiveSection} materialPanel={activeSection === 'materials' && generation.status === 'idle' ? <MaterialLibrary targetPosition={activePosition} onSelect={addLibraryMaterial} onClose={() => setActiveSection('home')} /> : null}>
+    <WorkspaceShell activeSection={activeSection} onNavigate={setActiveSection} contentLayout={isWorkspace ? 'creation' : 'default'} materialPanel={activeSection === 'materials' && generation.status === 'idle' ? <MaterialLibrary targetPosition={activePosition} selectedMaterialIds={selection.filter(slot => slot.source === 'library').map(slot => slot.materialId)} onClose={() => setActiveSection('home')} /> : null}>
       {/* Keep recognition mounted across workspace navigation and generation. */}
       <div className={`${styles.homeContent} ${activeSection === 'materials' ? styles.libraryWorkspace : ''}`} hidden={!isWorkspace || generation.status !== 'idle'}>
         <header className={styles.intro}>
@@ -85,7 +90,7 @@ export default function SpaceeHome({headingClassName,navigationFontClassName}) {
           <p data-node-id="119:13">Place three materials on the platform, or choose from Materials.</p>
         </header>
         <CameraRecognitionPanel cameraStarted={cameraStarted} cameraKey={cameraKey} cameraStatus={cameraStatus} recognitionStatus={status} videoRef={videoRef} activePosition={activePosition} onEnableCamera={() => setCameraStarted(true)} onVideoReady={onVideoReady} onCameraError={onCameraError} onCameraStatusChange={setCameraStatus} error={error} onRestart={() => {resetRecognition(); setCameraStatus('idle'); setCameraStarted(true); setCameraKey(key => key + 1);}} />
-        <MaterialComposer materials={materials} activePosition={activePosition} onSelectPosition={position => {setActivePosition(current => current === position ? null : position); setSelectionNotice('');}} onDropMaterial={addLibraryMaterial} onRemoveLibrary={position => {removeLibrary(position); setSelectionNotice('');}} requirement={description} onRequirementChange={setDescription} onClear={clearAll} onGenerate={generateSpace} canGenerate={readyToGenerate} canClear={cameraStarted || recognizedCount > 0 || Boolean(description)} hint={composerHint} />
+        <MaterialComposer materials={materials} activePosition={activePosition} onSelectPosition={position => {setActivePosition(position); setSelectionNotice('');}} onDropMaterial={addLibraryMaterial} onRemoveLibrary={position => {removeLibrary(position); setSelectionNotice('');}} requirement={description} onRequirementChange={setDescription} onClear={clearAll} onGenerate={generateSpace} canGenerate={readyToGenerate} canClear={cameraStarted || recognizedCount > 0 || Boolean(description)} hint={composerHint} />
       </div>
       <div className={styles.generationContent} hidden={!isWorkspace || generation.status === 'idle'}>
         {generation.status !== 'idle' && <GenerationExperience generation={generation} headingClassName={headingClassName} onRetry={retry} onExplore={exploreAgain} />}

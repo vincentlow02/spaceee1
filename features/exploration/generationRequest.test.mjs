@@ -64,7 +64,7 @@ test('rebuilds the prompt server-side and ignores a client prompt', () => {
   });
 
   assert.equal(result.promptResult.prompt.includes(clientPrompt), false);
-  assert.match(result.promptResult.prompt, /Name: Coke Can/);
-  assert.match(result.promptResult.prompt, /Name: Black Can/);
-  assert.match(result.promptResult.prompt, /Name: Tissue/);
+  assert.match(result.promptResult.prompt, /first material is Coke Can/);
+  assert.match(result.promptResult.prompt, /second material is Black Can/);
+  assert.match(result.promptResult.prompt, /third material is Tissue/);
 });

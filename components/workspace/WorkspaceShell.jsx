@@ -51,7 +51,7 @@ export default function WorkspaceShell({children,activeSection,onNavigate,conten
       <header className={styles.topBar}>
         <Dialog.Trigger asChild><button className={styles.mobileToggle} aria-label="Open sidebar"><span aria-hidden="true">☰</span><span>Spaceee</span></button></Dialog.Trigger>
       </header>
-      <main className={`${styles.main} ${contentLayout === 'canvas' ? styles.canvasMain : ''} ${materialPanel ? styles.withMaterialPanel : ''}`}>{children}</main>
+      <main className={`${styles.main} ${contentLayout === 'canvas' ? styles.canvasMain : ''} ${contentLayout === 'creation' ? styles.creationMain : ''} ${materialPanel ? styles.withMaterialPanel : ''}`}>{children}</main>
     </div>
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-40 bg-black/20" />

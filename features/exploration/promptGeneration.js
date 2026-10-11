@@ -84,47 +84,25 @@ export function buildSpatialPrompt(
     };
   });
 
-  const observedMaterials = materials.flatMap((material) => [
-    `Priority ${material.priority} (Position ${material.position}):`,
-    `Name: ${material.name}`,
-    `Material ID: ${material.materialId}`,
-    `Category: ${material.category}`,
-    ...(material.materialPrompt ? [`Material profile: ${material.materialPrompt}`] : []),
-    'Known properties:',
-    `- Material: ${material.properties.material}`,
-    `- Texture: ${material.properties.texture}`,
-    `- Color: ${material.properties.color}`,
-    `- Form: ${material.properties.form}`,
-    '',
-  ]);
+  const ordinal = ['first','second','third'];
+  const observedMaterials = materials.map((material,index) => {
+    const knownProperties = Object.entries(material.properties)
+      .filter(([,value]) => value !== 'unknown')
+      .map(([key,value]) => `${key} is ${value}`);
+    const category = material.category === 'unknown' ? '' : ` in the ${material.category} category`;
+    const profile = material.materialPrompt ? ` ${material.materialPrompt}` : '';
+    const facts = knownProperties.length ? ` Verified qualities: ${knownProperties.join(', ')}.` : '';
+    return `The ${ordinal[index]} material is ${material.name}${category}.${profile}${facts}`;
+  });
 
   const prompt = [
-    'ROLE',
-    'Redesign the supplied base space through a set of physically discovered materials.',
-    '',
+    'Create a finished, photorealistic interior by editing the supplied base-room photograph.',
     SPATIAL_TEMPLATE_INSTRUCTIONS,
-    '',
-    'OBSERVED FACTS',
-    'The following identities and factual properties were supplied by the discovery system. Treat unavailable information as unknown.',
-    '',
     ...observedMaterials,
-    'AI INTERPRETATION',
-    'Interpret relationships between the discovered materials and explore how their material qualities could influence a spatial environment.',
-    'Search for unexpected relationships and translate them into a coherent spatial possibility.',
-    'The observations state what was discovered; you decide what their relationship could become spatially.',
-    '',
-    'CONSTRAINTS',
-    '- Do not simply place or mechanically reproduce the three physical objects in a room.',
-    '- Do not assume a conventional room type or impose a predefined architectural or interior style.',
-    '- Do not force a known design movement or a manually predefined material-combination rule.',
-    '- Base the interpretation on the supplied facts while keeping creative spatial interpretation open-ended.',
-    '',
-    'OUTPUT',
-    'Generate one 2D spatial image of the supplied base room redesigned through the selected material combination.',
-    'Preserve the base room structure and camera perspective while transforming its material expression. Do not create a different room, a flat collage, a product mockup, or a technical floor plan.',
-    'Translate the discovered material qualities into the spatial composition rather than arranging recognizable product objects in a room.',
-    'Keep architectural style, atmosphere, spatial type, and emotional interpretation open to your interpretation of the materials; do not impose fixed material meanings.',
-  ].join('\n');
+    'Use that ordering only to guide the relative influence of the materials. Translate their verified qualities into surfaces and architectural details rather than displaying the source products themselves.',
+    'Furnish the room as a believable, complete interior with proportionate furniture, practical lighting, soft furnishings, and a coherent atmosphere. Keep the specific style open to an interpretation of the verified material facts.',
+    'The final image must contain only the interior scene. Do not include typography, letters, numbers, captions, labels, annotations, diagrams, floor plans, material samples, swatches, tables, borders, side panels, specification sheets, presentation boards, mood boards, posters, or interface elements anywhere in the frame.',
+  ].join(' ');
 
   return {
     prompt,

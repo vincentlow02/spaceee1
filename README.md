@@ -2,6 +2,16 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Create `.env.local` and add a Singapore-region Alibaba Cloud Model Studio
+pay-as-you-go API key:
+
+```dotenv
+QWEN_API_KEY=replace-with-your-key
+```
+
+The Qwen endpoint and image-edit model are configured by the server. Do not use
+a Coding Plan key or a key created in another region.
+
 First, run the development server:
 
 ```bash

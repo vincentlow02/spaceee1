@@ -1,28 +1,20 @@
 /* Standalone generation-preview retains its existing white page shell. */
 .page { min-height: 100svh; display: flex; align-items: center; justify-content: center; background: #fff; color: #142033; font-family: var(--font-geist-sans), Arial, sans-serif; padding: clamp(24px,4svh,48px) clamp(24px,4vw,64px); }
-.homeContent { display: flex; flex-direction: column; align-items: center; width: min(100%,780px); margin: 0 auto; }
+.homeContent { display: flex; flex-direction: column; align-items: center; gap: 24px; width: min(100%,680px,max(320px,calc((100svh - 430px) * 1.744))); margin: 0 auto; }
 .homeContent[hidden],.generationContent[hidden] { display: none; }
-.intro { text-align: center; margin-bottom: 17px; }
+.intro { text-align: center; }
 .intro h1 { margin: 0; color: #000; font-size: 24px; font-weight: 400; line-height: .94; letter-spacing: .48px; }
 .intro h1:focus,.emptySection h1:focus { outline: none; }
 .intro p { margin: 6px 0 0; color: #595959; font-size: 16px; line-height: 1.02; }
-.homeContent > form { margin-top: 31px; }
+.homeContent > section { width: 100%; }
+.homeContent > form { max-width: none; margin-top: 0; min-height: 206px; display: flex; flex-direction: column; gap: 12px; }
+.homeContent > form > footer { margin-top: auto; }
+.homeContent > form > textarea { margin-top: 0; margin-bottom: 0; }
 .libraryWorkspace .intro { display: none; }
-.libraryWorkspace { width: min(100%,760px,max(320px,calc((100svh - 330px) * 1.744))); padding-top: 0; gap: 24px; }
-.libraryWorkspace > section { width: 100%; }
-.libraryWorkspace > form { max-width: none; margin-top: 0; min-height: 206px; display: flex; flex-direction: column; gap: 12px; }
-.libraryWorkspace > form > footer { margin-top: auto; }
-.libraryWorkspace > form > textarea { margin-top: 0; margin-bottom: 0; }
-@container workspace (max-width:800px) {
-  .libraryWorkspace { width: min(100%,680px); }
-  .libraryWorkspace > section > div:first-child { aspect-ratio: auto; height: clamp(180px,24svh,240px); }
-}
-.generationContent { display: flex; justify-content: center; --generation-reserved-space: 146px; }
+.generationContent { display: flex; justify-content: center; width: 100%; min-width: 0; flex: 1 1 100%; --generation-reserved-space: 146px; }
 .emptySection { margin: 80px auto; width: min(600px,100%); }
 .emptySection > span { color: #a39a94; font-size: 10px; letter-spacing: 1.2px; }
 .emptySection h1 { font-size: 40px; font-weight: 400; margin: 22px 0; }
 .emptySection p { color: #8e8787; font-size: 14px; line-height: 1.7; max-width: 460px; }
 .emptySection button { background: #000; color: #fff; border: 0; border-radius: 7px; padding: 10px 16px; margin-top: 20px; font-size: 12px; cursor: pointer; }
-@media (max-height:760px) and (min-width:701px) { .homeContent:not(.libraryWorkspace) > form { margin-top: 24px; } }
-@media (max-width:700px) { .intro p { font-size: 13px; max-width: 290px; line-height: 1.4; margin-top: 10px; } .intro { margin-bottom: 24px; } .homeContent > form { margin-top: 24px; } .page { padding: 40px 20px; } }
-@media (max-width:700px) { .libraryWorkspace { gap: 16px; } .libraryWorkspace > form { margin-top: 0; min-height: 190px; } }
+@media (max-width:700px) { .intro p { font-size: 13px; max-width: 290px; line-height: 1.4; margin-top: 10px; } .homeContent { gap: 16px; } .homeContent > form { min-height: 190px; } .page { padding: 40px 20px; } }

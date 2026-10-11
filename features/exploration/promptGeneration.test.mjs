@@ -28,11 +28,8 @@ test('builds a deterministic prompt containing all materials in snapshot priorit
   const second = buildSpatialPrompt(input);
 
   assert.equal(first.prompt, second.prompt);
-  assert.ok(first.prompt.indexOf('Priority 1 (Position 1):') < first.prompt.indexOf('Priority 2 (Position 2):'));
-  assert.ok(first.prompt.indexOf('Priority 2 (Position 2):') < first.prompt.indexOf('Priority 3 (Position 3):'));
-  assert.match(first.prompt, /Name: Coke Can/);
-  assert.match(first.prompt, /Name: Black Can/);
-  assert.match(first.prompt, /Name: Tissue/);
+  assert.ok(first.prompt.indexOf('first material is Coke Can') < first.prompt.indexOf('second material is Black Can'));
+  assert.ok(first.prompt.indexOf('second material is Black Can') < first.prompt.indexOf('third material is Tissue'));
 });
 
 test('preserves physical position order instead of sorting by material identity', () => {
@@ -49,7 +46,7 @@ test('preserves physical position order instead of sorting by material identity'
     'material-a',
     'material-c',
   ]);
-  assert.ok(result.prompt.indexOf('Material ID: material-b') < result.prompt.indexOf('Material ID: material-a'));
+  assert.ok(result.prompt.indexOf('first material is Material B') < result.prompt.indexOf('second material is Material A'));
 });
 
 test('uses unknown for missing properties without inventing information', () => {
@@ -59,8 +56,7 @@ test('uses unknown for missing properties without inventing information', () => 
     { materialId: 'tissue' },
   ]));
 
-  assert.match(result.prompt, /- Texture: unknown/);
-  assert.match(result.prompt, /- Material: unknown/);
+  assert.doesNotMatch(result.prompt, /Texture: unknown|Material: unknown/);
   assert.equal(result.materials[0].properties.texture, 'unknown');
 });
 
@@ -105,9 +101,28 @@ test('uses the fixed base as structural input, not just as a style reference', (
   const {prompt} = buildSpatialPrompt(snapshot([
     {materialId:'coke-can'}, {materialId:'blackcan'}, {materialId:'tissue'},
   ]));
-  assert.match(prompt, /fixed spatial template, not a style reference/);
+  assert.match(prompt, /fixed spatial template rather than using it as a style reference/);
   assert.match(prompt, /Preserve its room geometry, camera angle, perspective/);
   assert.match(prompt, /central floor-to-ceiling window/);
-  assert.match(prompt, /one 2D spatial image of the supplied base room/);
+  assert.match(prompt, /one photorealistic interior view of this same base space/);
   assert.doesNotMatch(prompt, /not a photorealistic 3D interior rendering/);
+});
+
+test('requests a furnished interior without rendering prompt metadata as a board', () => {
+  const {prompt} = buildSpatialPrompt(snapshot([
+    {materialId:'coke-can'}, {materialId:'blackcan'}, {materialId:'tissue'},
+  ]));
+  assert.match(prompt, /believable, complete interior/);
+  assert.match(prompt, /must contain only the interior scene/);
+  assert.doesNotMatch(prompt, /OBSERVED FACTS|AI INTERPRETATION|Priority \d|Material ID:/);
+});
+
+test('passes distinct White PVC and Aluminum profiles into the existing spatial prompt', () => {
+  const result = buildSpatialPrompt(snapshot([
+    {materialId:'koeido-eb-02'}, {materialId:'koeido-al-03'}, {materialId:'jute'},
+  ]));
+  assert.match(result.prompt, /smooth, opaque white PVC plastic material/);
+  assert.match(result.prompt, /realistic natural silver aluminum/);
+  assert.match(result.prompt, /Avoid exaggerated mirror reflections, heavy brushed patterns/);
+  assert.deepEqual(result.materials.slice(0,2).map(material => material.materialId), ['koeido-eb-02','koeido-al-03']);
 });

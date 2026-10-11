@@ -28,12 +28,13 @@
 .accountPopover a { color: #69645f; text-decoration: none; }
 .accountPopover button { display: block; margin-top: 14px; background: none; border: 0; color: #000; padding: 0; cursor: pointer; }
 .main { padding: clamp(60px,8svh,90px) clamp(24px,3.125vw,60px) clamp(32px,8svh,77px); min-height: 100svh; }
+.creationMain { padding: 32px clamp(20px,2.5vw,40px); display: flex; align-items: center; }
 .withMaterialPanel { grid-column: 2; min-width: 0; padding: 32px clamp(20px,2.5vw,40px); display: flex; align-items: center; }
 .canvasMain { padding: 28px clamp(16px,2vw,36px) 24px; }
 .mobileToggle,.mobileClose,.backdrop { display: none; }
 .shell button:focus-visible,.shell a:focus-visible { outline: 2px solid #8e8787; outline-offset: 4px; }
 /* Respond to the available workspace width, including collapsed navigation. */
-@container workspace (max-width:800px) {
+@container workspace (max-width:760px) {
   .materialPanel { grid-column: 1 / -1; position: static; height: auto; overflow-y: visible; border-bottom: 1px solid #ededed; }
   .withMaterialPanel { grid-column: 1 / -1; min-height: 0; padding: 28px 24px; }
 }
@@ -53,6 +54,7 @@
   .mobileToggle { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; font-size: 17px; font-weight: 500; color: #000; cursor: pointer; }
   .mobileToggle > span:first-child { font-size: 19px; }
   .main { padding: 100px 20px 40px; }
+  .creationMain { padding: 88px 16px 32px; }
   .withMaterialPanel { padding: 24px 16px 32px; }
   .canvasMain { padding: 88px 12px 24px; }
   .navigation { gap: 24px; }

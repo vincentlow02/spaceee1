@@ -10,24 +10,37 @@
 .search input { width: 100%; min-width: 0; border: 0; background: transparent; font-size: 13px; outline: none; }
 .search:focus-within { border-color: #8eaa92; box-shadow: 0 0 0 2px #e6f2e7; }
 .grid { list-style: none; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; padding: 0; margin: 0; }
-.card { display: block; width: 100%; border: 0; background: transparent; padding: 0; text-align: left; cursor: pointer; }
-.thumbnail { display: grid; place-items: center; aspect-ratio: 1.4; border-radius: 11px; background: #e9e5df; border: 1px solid #00000004; transition: box-shadow .15s; }
-.thumbnail[data-tone='1'] { background: #e8e8e6; }
-.thumbnail[data-tone='2'] { background: #efece5; }
-.thumbnail[data-tone='3'] { background: #dededb; }
-.thumbnail > span { color: #98938c; font-size: 10px; }
-.card:hover .thumbnail { box-shadow: 0 0 0 2px #b6d8ba; }
-.name { display: block; font-size: 12px; line-height: 1.5; margin-top: 7px; }
+.grid > li { min-width: 0; }
+.card { display: block; width: 100%; border: 1px solid transparent; border-radius: 13px; background: transparent; padding: 5px; text-align: left; cursor: grab; transition: border-color .16s,background-color .16s; }
+.card:active { cursor: grabbing; }
+.card:hover { background: #fafaf8; }
+.cardSelected { border-color: #a9cfae; background: #f5faf5; }
+.imageFrame { position: relative; width: 100%; aspect-ratio: 1.28; overflow: hidden; border-radius: 9px; background: #eeece7; }
+.productImage { display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(var(--material-image-scale, 1)); }
+.imageFallback { display: grid; width: 100%; height: 100%; place-items: center; padding: 8px; color: #96918a; font-size: 10px; text-align: center; }
+.cardFooter { display: flex; align-items: center; gap: 4px; min-width: 0; padding: 8px 1px 2px; }
+.supplierLogo { display: grid; flex: 0 0 18px; width: 18px; height: 18px; place-items: center; overflow: hidden; border: 1px solid #dededb; border-radius: 50%; box-sizing: border-box; background: #fff; color: #74746f; }
+.supplierLogo img { display: block; width: 13px; height: 15px; object-fit: contain; filter: brightness(0); opacity: .72; }
+.supplierLogo > span { font-size: 7px; font-weight: 600; }
+.cardNames { display: flex; flex: 1 1 auto; flex-direction: column; min-width: 0; gap: 1px; }
+.name { display: block; overflow: hidden; color: #222; font-size: 9px; font-weight: 500; line-height: 1.35; letter-spacing: -.16px; text-overflow: clip; white-space: nowrap; user-select: none; }
+.name[role='link'] { cursor: pointer; }
+.name[role='link']:hover { text-decoration: underline; text-underline-offset: 2px; }
+.name[role='link']:focus-visible,.sourceLink:focus-visible { outline: 2px solid #8eaa92; outline-offset: 2px; border-radius: 3px; }
+.japaneseName { overflow: hidden; color: #88827d; font-size: 9px; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.sourceLink { display: grid; flex: 0 0 16px; width: 16px; height: 16px; place-items: center; border-radius: 50%; color: #68635e; }
+.sourceLink:hover { background: #eeece7; color: #1c211d; }
+.sourceLink svg { display: block; width: 12px; height: 12px; }
 .hint,.empty { margin: 24px 0 0; color: #929292; font-size: 12px; line-height: 1.6; }
 @media (max-width:1000px) and (min-width:701px) { .library { padding: 24px 16px; } .header h2 { font-size: 17px; } .categories button { padding: 6px 9px; } .grid { gap: 12px; } }
 @media (max-width:700px) { .library { padding: 20px; } }
-@container workspace (max-width:800px) {
-  .library { padding: 18px 20px; }
+@container workspace (max-width:1000px) {
+  .library { width: min(100%,360px); padding: 18px 20px; }
   .header { margin-bottom: 12px; }
   .categories { margin-bottom: 12px; }
   .search { margin-bottom: 14px; }
-  .grid { display: flex; gap: 12px; overflow-x: auto; padding: 2px 2px 8px; }
-  .grid > li { flex: 0 0 120px; }
-  .thumbnail { aspect-ratio: 1.6; }
+  .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; overflow: visible; padding: 2px; }
+  .grid > li { min-width: 0; }
+  .imageFrame { aspect-ratio: 1.28; }
   .hint { display: none; }
 }

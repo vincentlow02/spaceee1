@@ -28,7 +28,7 @@ test('Library-only selection is valid without any camera and uses the same gener
   assert.ok(snapshot.materials.every(material => material.confidence === null));
   const prepared = prepareGenerationRequest({snapshot});
   assert.deepEqual(prepared.snapshot.materials.map(material => material.materialId),ids);
-  assert.ok(prepared.promptResult.prompt.includes('Material profile: Material: Japanese Igusa.'));
+  assert.ok(prepared.promptResult.prompt.includes('Material: Japanese Igusa.'));
   assert.equal(createMaterialSlots([{position:1,...selected[0]}])[0].material,getMaterialById(ids[0]));
 });
 
@@ -78,7 +78,7 @@ test('test model compatibility remains technical-only; unsupported drops are rej
   assert.equal(getMaterialSelectionEligibility(tests,frame()).eligible,true);
   assert.equal(resolveMaterial('black-can').id,'blackcan');
   assert.equal(resolveMaterial('coke-can').dataStatus,'technical-test');
-  assert.equal(getLibraryMaterials().length,5);
+  assert.equal(getLibraryMaterials().length,7);
   assert.ok(getLibraryMaterials().every(material => material.dataStatus !== 'technical-test'));
   const unsupported = resolveMaterialSelection(state,frame(['unregistered','jute','tissue']));
   assert.equal(unsupported[0].materialId,null);

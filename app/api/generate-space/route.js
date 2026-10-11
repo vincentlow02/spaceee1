@@ -10,6 +10,12 @@ function safeGenerationError(error) {
   switch (error?.code) {
     case 'MISSING_API_KEY':
       return { status: 500, message: 'Qwen API is not configured.' };
+    case 'QWEN_AUTH_FAILED':
+      return { status: 502, message: 'The Qwen API key is invalid or expired.' };
+    case 'QWEN_ACCESS_DENIED':
+      return { status: 502, message: 'The Qwen API key does not have access to image editing.' };
+    case 'QWEN_MODEL_UNAVAILABLE':
+      return { status: 502, message: 'Qwen image editing is unavailable for this API key or region.' };
     case 'BASE_IMAGE_UNAVAILABLE':
       return { status: 500, message: 'The fixed space base image is unavailable.' };
     case 'INVALID_IMAGE_EDIT_MODEL':
@@ -60,6 +66,8 @@ export async function POST(request) {
     console.error('Space generation failed.', {
       code: error?.code || 'UNKNOWN',
       status: error?.status || null,
+      providerCode: error?.providerCode || null,
+      requestId: error?.requestId || null,
     });
     return Response.json({ error: safe.message }, { status: safe.status });
   }
