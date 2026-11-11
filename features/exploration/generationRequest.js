@@ -1,7 +1,13 @@
-import { buildSpatialPrompt } from './promptGeneration.js';
+import { isGenerationCandidateMaterial } from '../../lib/materials/materials.js';
+import { validateMaterialSnapshot } from './generationDataContract.js';
+import { getSpaceType } from './spaceTypes.js';
 
-const REQUIRED_POSITIONS = Object.freeze([1, 2, 3]);
-const MATERIAL_ID_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/;
+const SNAPSHOT_ISSUE_MESSAGES = Object.freeze({
+  INVALID_POSITION:'Snapshot positions must be exactly 1, 2, and 3.',
+  INVALID_PRIORITY:'Each material priority must match its physical position.',
+  DUPLICATE_MATERIAL_ID:'Snapshot material IDs must be unique.',
+  UNKNOWN_MATERIAL_ID:'Every selected material must exist in the canonical Material Registry.',
+});
 
 export class GenerationRequestValidationError extends Error {
   constructor(message) {
@@ -23,76 +29,44 @@ export function validateGenerationSnapshot(snapshot) {
   if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot)) {
     invalid('A valid Exploration Snapshot is required.');
   }
-
   if (snapshot.status !== 'captured') {
     invalid('The Exploration Snapshot must have captured status.');
   }
-
   if (!Array.isArray(snapshot.materials) || snapshot.materials.length !== 3) {
     invalid('The Exploration Snapshot must contain exactly three materials.');
   }
-
-  const positions = snapshot.materials.map((material) => material?.position);
-  const priorities = snapshot.materials.map((material) => material?.priority);
-
-  if (!REQUIRED_POSITIONS.every((position) => positions.includes(position))) {
-    invalid('Snapshot positions must be exactly 1, 2, and 3.');
+  const validation = validateMaterialSnapshot(snapshot);
+  if (!validation.ok) {
+    const issue = validation.issues[0];
+    invalid(SNAPSHOT_ISSUE_MESSAGES[issue?.code] ||
+      (issue?.path?.at(-1) === 'materialId'
+        ? 'Every snapshot material must include a valid materialId.'
+        : 'The Exploration Snapshot is invalid.'));
   }
-
-  if (!REQUIRED_POSITIONS.every((priority) => priorities.includes(priority))) {
-    invalid('Snapshot priorities must be exactly 1, 2, and 3.');
+  const { snapshot: normalized } = validation;
+  if (normalized.materials.some(material => !isGenerationCandidateMaterial(material.materialId))) {
+    invalid('Retired materials are not candidates for new generation.');
   }
-
-  const materials = snapshot.materials.map((material) => {
-    if (material.position !== material.priority) {
-      invalid('Each material priority must match its physical position.');
-    }
-
-    if (
-      typeof material.materialId !== 'string' ||
-      material.materialId.length > 80 ||
-      !MATERIAL_ID_PATTERN.test(material.materialId)
-    ) {
-      invalid('Every snapshot material must include a valid materialId.');
-    }
-
-    return Object.freeze({
-      position: material.position,
-      priority: material.priority,
-      materialId: material.materialId,
-      confidence: Number.isFinite(material.confidence) ? material.confidence : 0,
-    });
-  });
-
-  const materialIds = materials.map((material) => material.materialId);
-  if (new Set(materialIds).size !== materialIds.length) {
-    invalid('Snapshot material IDs must be unique.');
-  }
-
-  const sessionId =
-    typeof snapshot.sessionId === 'string' && snapshot.sessionId.trim().length > 0
-      ? snapshot.sessionId.trim().slice(0, 120)
-      : 'unspecified-session';
-
-  return Object.freeze({
-    sessionId,
-    createdAt: typeof snapshot.createdAt === 'string' ? snapshot.createdAt : null,
-    materials: Object.freeze(materials),
-    status: 'captured',
-  });
+  return normalized;
 }
 
 /**
- * Prepare the trusted server input. A client-supplied prompt is never read;
- * buildSpatialPrompt remains the only source of prompt construction.
+ * Normalize the three selected slots before any provider or job work.
+ * Accept empty legacy description fields so older material-only jobs can finish.
  */
-export function prepareGenerationRequest(body) {
+export function prepareGenerationRequest(body, {requireSpaceType = false} = {}) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     invalid('A JSON request body is required.');
   }
+  if ((requireSpaceType || body.snapshot?.spaceType != null) && !getSpaceType(body.snapshot?.spaceType)) {
+    invalid('A valid spaceType is required.');
+  }
+  if ((body.userRequest != null && (typeof body.userRequest !== 'string' || body.userRequest.trim())) ||
+      body.refinementImageUrl != null) {
+    const error = new GenerationRequestValidationError('This version only supports generation from three materials.');
+    error.code = 'LEGACY_GENERATION_UNSUPPORTED';
+    throw error;
+  }
 
-  const snapshot = validateGenerationSnapshot(body.snapshot);
-  const promptResult = buildSpatialPrompt(snapshot);
-
-  return { snapshot, promptResult };
+  return { snapshot: validateGenerationSnapshot(body.snapshot) };
 }

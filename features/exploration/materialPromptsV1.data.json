@@ -1,0 +1,81 @@
+{
+  "version": "spaceee-15-material-prompts-v1",
+  "source": "D:/spaceee_15_material_prompts_v1.md",
+  "records": [
+    {
+      "materialId": "japanese-igusa",
+      "name": "Japanese Igusa",
+      "prompt": "Muted pale straw yellow-green Japanese igusa rush-grass surface with densely packed fine parallel natural grass fibers and delicate transverse tonal bands. Tight directional weaving, subtle variations of straw yellow, pale olive and beige, and fine shallow woven relief. Generally flat, finely tactile but not coarse, completely matte and non-reflective. Preserve the authentic fine rush-grass texture and subtle crosswise weaving rhythm. Avoid bamboo strips, wood grain, coarse wicker, synthetic green matting, glossy finishes, large weaving gaps, and artificial repetitive patterns."
+    },
+    {
+      "materialId": "jute",
+      "name": "Black Jute",
+      "prompt": "Pure black, densely woven natural jute textile with a compact square-grid pattern of interlaced horizontal and vertical fiber bundles. Slightly irregular yarns, subtle raised intersections, fine fiber fuzz, and narrow nearly opaque gaps. Mostly flat with gentle woven relief, dry matte finish, and minimal gray highlights revealing texture. Keep the entire textile surface distinctly black and visibly woven, not smooth, glossy, or perforated."
+    },
+    {
+      "materialId": "cork",
+      "name": "Cork",
+      "prompt": "Warm honey-ochre and golden-tan natural cork, with irregular caramel and earthy-brown fragments of varying sizes. Larger flattened cork pieces mixed with finer granules, thin dark boundaries, tiny scattered pores, and subtle shallow surface relief. Predominantly flat, dry matte finish, non-directional organic pattern. Avoid uniform brown surfaces, wood grain, exaggerated roughness, repetitive tile patterns, and glossy finishes."
+    },
+    {
+      "materialId": "split-marble-gray",
+      "name": "Split Marble Gray",
+      "prompt": "Dark charcoal-gray natural stone with dense, irregular angular crystalline grains in mixed charcoal, medium gray, pale silver-gray, and near-black tones. Distinctly rough, uneven granular relief with tightly packed mineral fragments and a naturally mottled, non-directional pattern. Predominantly matte, with a moderate scattering of tiny silvery-white mineral glints visible under directional light. Avoid smooth marble, concrete, polished granite, terrazzo, metallic reflections, and repetitive printed textures."
+    },
+    {
+      "materialId": "oak-knotty-e190",
+      "name": "Oak Knotty E190",
+      "prompt": "Natural light oak brown with a subtle warm yellow undertone, fine dense linear oak grain, moderate natural tone variation, a matte non-reflective and visually smooth surface, and occasional restrained natural knots. Let the wood grain follow the assigned furniture or architectural surface. Avoid gray-brown or orange-heavy oak, gloss, oversized rustic knots, and repeated artificial wood grain. Do not add arbitrary plank seams unless they are visible in the real reference and appropriate to the assigned surface."
+    },
+    {
+      "materialId": "cement-02-ea6652k",
+      "name": "Cement 02 / EA6652K",
+      "prompt": "Muted medium-gray cement architectural panel with a very subtle gray-green undertone, gentle natural light-and-dark gray mottling, and a dense fine-grained sandy mineral texture. Tiny irregular particles, delicate speckling, and occasional minute pores across a broadly flat surface. Slight granular relief, mildly sandy tactile appearance, completely matte and non-reflective. Avoid coarse stone grains, crystalline sparkles, deep cracks, large concrete pores, strong green coloration, glossy finishes, heavy stains, and perfectly uniform painted surfaces."
+    },
+    {
+      "materialId": "sekaido-silver-metallic-01",
+      "name": "Sekaido Silver Metallic",
+      "prompt": "Neutral silver-gray metallic-effect surface with pronounced silvery highlights and visible but softly blurred environmental reflections. Exceptionally smooth and flat, without intentional brushed grain or tactile roughness. Preserve realistic reflective metallic appearance without perfect chrome mirror clarity, glitter, permanent scratches, or matte gray paint."
+    },
+    {
+      "materialId": "black-transparent-pvc-01",
+      "name": "Black Transparent PVC",
+      "prompt": "Dark smoke-black transparent PVC sheet with a smooth, flat surface and clear dark-tinted transparency. Objects behind remain recognizable but visibly darkened. Very subtle soft surface reflections, without frosted diffusion, opaque black coloration, rough texture or strong mirror-like highlights."
+    },
+    {
+      "materialId": "acrylic-sheet-01",
+      "name": "Acrylic Sheet",
+      "prompt": "Acrylic sheet with ONE clearly specified visual finish matching the selected reference: pale translucent linear stripes, pale milky frost, warm beige fine granular texture, OR reflective silver-looking embossed acrylic. Maintain the selected variant’s actual color, transparency and reflectivity; do not merge all four into one material surface. It is acrylic even when the finish looks metallic. Never assume all acrylic is crystal-clear or imitate thick structural glass. If the real sample/variant is not selected and matched, require verification rather than invent a finish."
+    },
+    {
+      "materialId": "natural-rubber-01",
+      "name": "Natural Rubber",
+      "prompt": "Deep charcoal-black rubber with a slight neutral gray cast and a dense field of tiny shallow recessed square impressions arranged in a fine regular orthogonal micro-grid. The impressions are pressed into the solid surface without passing through it. Subtle tactile micro-relief remains visible while the overall sheet is broadly flat and orderly. Completely matte and non-reflective, with texture revealed by soft micro-shadows rather than glossy highlights. Preserve the appearance of solid embossed rubber, not woven fabric, perforated mesh, raised studs, or glossy plastic."
+    },
+    {
+      "materialId": "tilepark-prague-rf400",
+      "name": "Prague Tile RF-400",
+      "prompt": "Deep muted ocean-blue glazed ceramic tile, predominantly blue with minimal green undertones. Soft, naturally irregular cloud-like variations within the glaze shift between deep ocean blue, slightly lighter muted blue, and subtle blue-gray tones. Exceptionally smooth ceramic surface with a distinct glossy finish, soft slightly distorted environmental reflections, and no noticeable physical relief. Preserve the rich blue ceramic appearance and gentle intrinsic glaze variation. Avoid green-dominant teal, flat blue paint, matte surfaces, rough mineral texture, metallic reflections, plastic appearance, and perfect mirror glare."
+    },
+    {
+      "materialId": "daiso-shoji-paper-01",
+      "name": "Shoji Paper",
+      "prompt": "Soft warm off-white Japanese shoji paper with a gentle ivory warmth and faint, naturally irregular fine paper fibers. Broadly flat surface with a subtle tactile paper-fiber texture and a matte, non-reflective appearance. Translucent and softly light-diffusing: natural light passes through, creating gentle luminous areas, while objects behind appear only as blurred silhouettes without sharp details. Preserve the delicate paper character and diffuse light transmission rather than clear glass-like transparency, opaque white panels, glossy plastic, or woven fabric."
+    },
+    {
+      "materialId": "wool-felt-01",
+      "name": "Wool Felt",
+      "prompt": "Soft warm ivory-white wool felt with a dense non-woven surface of clearly visible, fine interlocked fibers. Noticeably fuzzy and gently fluffy, with an exceptionally soft plush texture and subtle wispy fibers. Mostly diffused light with a very slight soft sheen, without glossy highlights. Preserve the natural fibrous character, avoiding regular woven patterns, smooth synthetic foam, coarse wool clumps, or exaggerated long fur."
+    },
+    {
+      "materialId": "bamboo-slat-01",
+      "name": "Bamboo Rods",
+      "prompt": "Pale natural straw-beige bamboo in the form of slender individual rod-like sticks, matching the photographed bamboo chopstick sample. Show natural fine linear surfaces and subtle tonal variation, preserving the separate elongated rods when assembled into a suitable nonstructural design element. Do not turn the sample into a solid bamboo panel, thick bamboo culms, prefabricated load-bearing slats, rattan wicker or oak wood grain. Avoid adding imagined large-scale architectural or structural properties."
+    },
+    {
+      "materialId": "natsusobiku-ametsuchi-01",
+      "name": "Ametsuchi Linen",
+      "prompt": "Light warm greige linen textile with subtle pale gray-beige, natural beige, and warm ivory yarn variations. Fine, densely interlaced horizontal and vertical threads form a delicate, small-scale woven grid. The weave is orderly but shows slight natural differences in yarn thickness and coloration. Broadly flat surface with subtle shallow woven relief, finely tactile but not coarse, completely matte and non-reflective. Preserve the clearly recognizable fine linen weave without coarse jute fibers, fuzzy felt, glossy finishes, or featureless smooth fabric."
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "version": "material-library-generation-inputs-v1",
+  "scope": [
+    "living-room:universal",
+    "bedroom:universal",
+    "tea-room:universal",
+    "personal-lounge:universal",
+    "studio:universal",
+    "bathroom:universal"
+  ],
+  "records": [
+    {
+      "materialId": "japanese-igusa",
+      "path": "/materials/japanese-igusa-texture.jpg",
+      "mime": "image/jpeg",
+      "sha256": "59d69f70609c65eb15f1982ad03861e98bef6df3b636b17e1b2afa94a9d5b034",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "jute",
+      "path": "/materials/jute.jpg",
+      "mime": "image/jpeg",
+      "sha256": "6fd645ee3c67f33e9f3a59bc9b5ad8a151823428b21feed089e9a503aa5dd0e0",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "cork",
+      "path": "/materials/cork-01.jpg",
+      "mime": "image/jpeg",
+      "sha256": "093f682b5597f50857f37d066da841e141597930e761fecb4c0bca817e62f666",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "split-marble-gray",
+      "path": "/materials/split-marble-gray.png",
+      "mime": "image/png",
+      "sha256": "b267883fc9d04ef393e8600070b6fad92e66dc5b89dbb7a512d1285dd570ec93",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "oak-knotty-e190",
+      "path": "/materials/oak-knotty-e190.jpg",
+      "mime": "image/jpeg",
+      "sha256": "630d18fa4fe5860aa01dd3c71630f6a041b3dddbbb35402fe0e72b3189996ad0",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "cement-02-ea6652k",
+      "path": "/materials/cement-02-ea6652k.jpg",
+      "mime": "image/jpeg",
+      "sha256": "42888dc97d2f0b63b88c7a7f23cac36f0f466884d3a2d46a1c62d0455e20de3a",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "sekaido-silver-metallic-01",
+      "path": "/materials/sekaido-silver-metallic-01.png",
+      "mime": "image/png",
+      "sha256": "846d3bf45d224a15f9a88b65ac297943de9eeece3f5c22f7ca867ebadb3813c2",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "black-transparent-pvc-01",
+      "path": "/materials/black-transparent-pvc-01.png",
+      "mime": "image/png",
+      "sha256": "b5a934e584f7280dc1fbd81569bf5e50894395bcbbf2cd58c9c021b3264ce5c5",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "acrylic-sheet-01",
+      "path": "/materials/acrylic-sheet-01.png",
+      "mime": "image/png",
+      "sha256": "fc88b0f2039ad10994ecfd7ea01ba1b69712457a479399b3e9c9cc603f2398d0",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "natural-rubber-01",
+      "path": "/materials/natural-rubber-01.jpg",
+      "mime": "image/jpeg",
+      "sha256": "6d1ff39966b957313af24f25bd8dc7764a6bd93ec3d6b60215d5a5a5d2e5b171",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "tilepark-prague-rf400",
+      "path": "/materials/tilepark-prague-rf400.png",
+      "mime": "image/png",
+      "sha256": "ff12d4de19afcfb6ee549832b0a157bd61939142b14a58dbea20742ecc22d2c1",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "daiso-shoji-paper-01",
+      "path": "/materials/daiso-shoji-paper-01.png",
+      "mime": "image/png",
+      "sha256": "e12a615b3735ea0e57287cd2c1bc5f7e3784f8b77dfde63659f28d9f7a5181b2",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "wool-felt-01",
+      "path": "/materials/wool-felt-01.png",
+      "mime": "image/png",
+      "sha256": "ccef410b5296d34ff3839fb52a600cac119fe6671c3de90c39caa62c81e22011",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "bamboo-slat-01",
+      "path": "/materials/bamboo-slat-01.png",
+      "mime": "image/png",
+      "sha256": "5cd7d5f5460cd04a0e300c8b608c4acc811faf54ea879624a47998eeb906dc67",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    },
+    {
+      "materialId": "natsusobiku-ametsuchi-01",
+      "path": "/materials/natsusobiku-ametsuchi-01.jpg",
+      "mime": "image/jpeg",
+      "sha256": "57b0377abf07a1f539531b6da8edc985f7994616c602a820353f5e76216987e0",
+      "sourceKind": "material-library-image",
+      "physicalVerified": false,
+      "approvalScope": [
+        "living-room:universal",
+        "bedroom:universal",
+        "tea-room:universal",
+        "personal-lounge:universal",
+        "studio:universal",
+        "bathroom:universal"
+      ]
+    }
+  ],
+  "approvalSource": "designer_instruction",
+  "approvalStatus": "approved_for_generation_input"
+}

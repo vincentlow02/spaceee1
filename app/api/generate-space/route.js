@@ -2,73 +2,62 @@ import {
   GenerationRequestValidationError,
   prepareGenerationRequest,
 } from '@/features/exploration/generationRequest';
+import { buildGenerationResponsePayload } from '@/features/exploration/generationResponse';
+import { executeDirectMaterialGeneration } from '@/features/exploration/directMaterialGenerationExecution';
 import { generateQwenImage } from '@/lib/qwenImage';
+import { createGenerationTrace, GENERATION_TRACE_HEADER, isGenerationId } from '@/features/exploration/generationTrace';
+import { persistentGenerationJobsEnabled } from '@/features/exploration/generationJobsRepository';
+import {
+  createVerifiedGenerationJobsRepository,
+} from '@/lib/supabase/generationJobs';
+import { verifiedGuest } from '@/lib/supabase/server';
+import { persistGeneratedImage, prepareImagePersistenceContext, serverImagePersistenceEnabled } from '@/features/exploration/imagePersistence';
+import { captureAppFailure } from '@/lib/monitoring/captureAppFailure';
+import { prepareDirectMaterialGeneration } from '@/features/exploration/directMaterialGenerationV1.mjs';
 
 export const runtime = 'nodejs';
-
-function safeGenerationError(error) {
-  switch (error?.code) {
-    case 'MISSING_API_KEY':
-      return { status: 500, message: 'Qwen API is not configured.' };
-    case 'QWEN_AUTH_FAILED':
-      return { status: 502, message: 'The Qwen API key is invalid or expired.' };
-    case 'QWEN_ACCESS_DENIED':
-      return { status: 502, message: 'The Qwen API key does not have access to image editing.' };
-    case 'QWEN_MODEL_UNAVAILABLE':
-      return { status: 502, message: 'Qwen image editing is unavailable for this API key or region.' };
-    case 'BASE_IMAGE_UNAVAILABLE':
-      return { status: 500, message: 'The fixed space base image is unavailable.' };
-    case 'INVALID_IMAGE_EDIT_MODEL':
-    case 'INVALID_IMAGE_EDIT_INPUT':
-      return { status: 500, message: 'Space image editing is not configured correctly.' };
-    case 'QWEN_TIMEOUT':
-      return { status: 504, message: 'Image generation timed out. Please try again.' };
-    case 'QWEN_MALFORMED_RESPONSE':
-    case 'QWEN_MISSING_IMAGE':
-      return { status: 502, message: 'The image service returned an invalid response.' };
-    case 'QWEN_REQUEST_FAILED':
-      return { status: 502, message: 'Image generation failed. Please try again.' };
-    default:
-      return { status: 500, message: 'Space generation failed.' };
-  }
-}
+export const maxDuration = 240;
 
 export async function POST(request) {
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return Response.json({ error: 'A valid JSON request body is required.' }, { status: 400 });
-  }
+  const requestId = request.headers.get(GENERATION_TRACE_HEADER);
+  const headers = isGenerationId(requestId) ? { [GENERATION_TRACE_HEADER]: requestId } : {};
 
-  let prepared;
-  try {
-    prepared = prepareGenerationRequest(body);
-  } catch (error) {
-    if (error instanceof GenerationRequestValidationError) {
-      return Response.json({ error: error.message }, { status: 400 });
-    }
-    return Response.json({ error: 'The generation request could not be prepared.' }, { status: 500 });
-  }
+  // Public generation always uses the direct material prompt and inline persistence flow.
+  const prepareNewRequest = body => {
+    const prepared = prepareGenerationRequest(body, { requireSpaceType: true });
+    const snapshot = { ...prepared.snapshot };
+    delete snapshot.referenceMode;
+    snapshot.referenceMode = 'B';
+    return { ...prepared, snapshot };
+  };
 
-  try {
-    const qwenResult = await generateQwenImage(prepared.promptResult.prompt);
-
-    return Response.json({
-      imageUrl: qwenResult.imageUrl,
-      requestId: qwenResult.requestId || null,
-      sessionId: prepared.snapshot.sessionId,
-      prompt: prepared.promptResult.prompt,
-    });
-  } catch (error) {
-    const safe = safeGenerationError(error);
-    // Log only non-sensitive classification data; never log credentials or payloads.
-    console.error('Space generation failed.', {
-      code: error?.code || 'UNKNOWN',
-      status: error?.status || null,
-      providerCode: error?.providerCode || null,
-      requestId: error?.requestId || null,
-    });
-    return Response.json({ error: safe.message }, { status: safe.status });
-  }
+  const traceEvents = [];
+  return executeDirectMaterialGeneration(request, {
+    GenerationRequestValidationError,
+    prepareGenerationRequest: prepareNewRequest,
+    verifiedGuest,
+    createTrace: generationId => createGenerationTrace({
+      generationId,
+      scope: 'backend',
+      sink: event => {
+        traceEvents.push(event);
+        console.info('spaceee.trace', JSON.stringify(event));
+      },
+    }),
+    getTraceEvents: () => traceEvents,
+    isPersistentJobsEnabled: persistentGenerationJobsEnabled,
+    requireGenerationLifecycle: true,
+    requireImagePersistence: true,
+    prepareImagePersistenceContext,
+    prepareDirectMaterialGeneration: async snapshot => {
+      return prepareDirectMaterialGeneration({
+        spaceType: snapshot.spaceType,
+        materialIds: snapshot.materials.map(material => material.materialId),
+      });
+    },
+    createGenerationJobsRepository: createVerifiedGenerationJobsRepository,
+    generateQwenImage,
+    buildGenerationResponsePayload,
+    persistImageResult: serverImagePersistenceEnabled() ? persistGeneratedImage : null,
+  });
 }
